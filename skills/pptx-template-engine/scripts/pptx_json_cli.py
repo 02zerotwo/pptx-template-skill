@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggregate CLI for pptx-json-engine skill scripts."""
+"""Aggregate CLI for pptx-template-engine skill scripts."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def _resolve(p: str) -> Path:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="pptx-json-engine CLI",
+        description="pptx-template-engine CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 Quick start (AI workflow):
@@ -98,7 +98,7 @@ Quick start (AI workflow):
 # ── setup ────────────────────────────────────────────────────────────
 
 def cmd_setup(_args: argparse.Namespace) -> int:
-    print("=== pptx-json-engine environment check ===")
+    print("=== pptx-template-engine environment check ===")
     print(f"Python:     {sys.version.split()[0]}")
     print(f"Skill root: {_SKILL_ROOT}")
     print(f"Scripts:    {_SCRIPTS_DIR}")

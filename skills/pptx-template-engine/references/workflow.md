@@ -35,7 +35,7 @@ python3 -m venv .venv && source .venv/bin/activate
 
 ## 3. AI 快速流程（3 条命令）
 
-所有命令从 `skills/pptx-json-engine/` 目录运行。
+所有命令从 `skills/pptx-template-engine/` 目录运行。
 
 | Step         | Command                                                                      | Output                       |
 | ------------ | ---------------------------------------------------------------------------- | ---------------------------- |
@@ -124,7 +124,7 @@ uv run python scripts/pptx_json_cli.py build ../../workspaces/market-growth
 ## 8. 运行测试
 
 ```bash
-# 从 skills/pptx-json-engine/ 目录运行
+# 从 skills/pptx-template-engine/ 目录运行
 uv run python -m unittest discover -s tests -t tests -v
 
 # 仅单元测试

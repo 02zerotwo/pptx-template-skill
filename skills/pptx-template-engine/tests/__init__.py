@@ -1,1 +1,1 @@
-"""Tests for pptx-json-engine."""
+"""Tests for pptx-template-engine."""

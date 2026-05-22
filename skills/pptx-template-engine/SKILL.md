@@ -1,5 +1,5 @@
 ---
-name: pptx-json-engine
+name: pptx-template-engine
 description: >
   Use when the user wants to generate a PPTX from a template.
   Analyzes the template into editable slots, lets AI write content JSON,
@@ -16,12 +16,12 @@ AI writes `deck_content.json` by default. AI does not directly edit XML, does no
 
 ## Workflow
 
-All commands run from `skills/pptx-json-engine/` directory via `uv run python scripts/pptx_json_cli.py`.
+All commands run from `skills/pptx-template-engine/` directory via `uv run python scripts/pptx_json_cli.py`.
 
 ### Step 0 — Setup environment (first time only)
 
 ```bash
-cd skills/pptx-json-engine
+cd skills/pptx-template-engine
 uv sync
 uv run python scripts/pptx_json_cli.py setup
 ```
