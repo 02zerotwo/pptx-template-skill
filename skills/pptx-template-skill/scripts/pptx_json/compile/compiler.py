@@ -16,7 +16,6 @@ from pptx_json.models.patch import SCHEMA_VERSION, write_patch_plan
 from pptx_json.models.reports import write_report
 from pptx_json.package.rels import load_relationships
 from pptx_json.validate.content_validator import validate_content
-from pptx_json.xmlns import REL_TYPES
 
 
 def _slide_index(manifest: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -37,9 +36,8 @@ def compile_patch(workspace: Path, content_path: Path) -> dict[str, Any]:
     content = load_content(content_path)
     slides_by_id = _slide_index(manifest)
 
-    # Read existing presentation rels to find the max rId in use by non-slide
-    # relationships (slideMaster, theme, presProps, etc.). New slide rIds must
-    # start *after* these to avoid overwriting them.
+    # New slide rIds must not collide with any existing presentation-level
+    # relationship, including notesMaster/theme/viewProps/tableStyles.
     pres_rels_path = workspace / "package" / "ppt" / "_rels" / "presentation.xml.rels"
     max_existing_rid = 0
     if pres_rels_path.exists():
@@ -50,12 +48,7 @@ def compile_patch(workspace: Path, content_path: Path) -> dict[str, Any]:
                     max_existing_rid = max(max_existing_rid, int(rel_id[3:]))
                 except ValueError:
                     pass
-    # Subtract existing slide count so we only reserve non-slide rIds
-    existing_slide_count = len([
-        rel for rel in load_relationships(pres_rels_path)
-        if rel.get("Type") == REL_TYPES["slide"]
-    ]) if pres_rels_path.exists() else 0
-    rid_start = max_existing_rid - existing_slide_count
+    rid_start = max_existing_rid
 
     operations: list[dict[str, Any]] = []
     for index, slide_content in enumerate(content.get("slides", []), start=1):
