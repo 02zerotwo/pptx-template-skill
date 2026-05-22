@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "title": "2026 年市场增长策略",
+  "operations": [
+    {
+      "type": "copy_slide",
+      "source_slide": "ppt/slides/slide1.xml",
+      "target_slide": "ppt/slides/slide1.xml",
+      "new_slide_id": 256,
+      "presentation_rel_id": "rId1",
+      "template_slide": "template-slide-001"
+    },
+    {
+      "type": "replace_text",
+      "target_slide": "ppt/slides/slide1.xml",
+      "binding": {
+        "shape_id": "2",
+        "xpath": ".//p:sp[p:nvSpPr/p:cNvPr/@id='2']/p:txBody"
+      },
+      "slot_id": "cover_title",
+      "content": "2026 年市场增长策略"
+    },
+    {
+      "type": "replace_image",
+      "target_slide": "ppt/slides/slide1.xml",
+      "binding": {
+        "shape_id": "3",
+        "rel_id": "rId2"
+      },
+      "slot_id": "hero_image",
+      "src": "assets/generated/hero.png",
+      "alt": "market strategy hero image"
+    }
+  ]
+}

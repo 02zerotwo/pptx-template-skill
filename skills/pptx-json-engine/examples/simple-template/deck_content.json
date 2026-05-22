@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "title": "2026 年市场增长策略",
+  "slides": [
+    {
+      "template_slide": "template-slide-001",
+      "content": {
+        "cover_title": {
+          "content": "2026 年市场增长策略"
+        },
+        "cover_subtitle": {
+          "content": "从渠道扩张到利润质量"
+        },
+        "hero_image": {
+          "src": "assets/generated/hero.png",
+          "alt": "market strategy hero image"
+        }
+      }
+    }
+  ]
+}
