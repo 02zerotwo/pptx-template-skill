@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze a PPTX template into a pptx-template-skill workspace."""
+"""Analyze a PPTX template into a pptx-translate-skill workspace."""
 
 from __future__ import annotations
 

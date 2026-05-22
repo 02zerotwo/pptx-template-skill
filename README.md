@@ -1,4 +1,4 @@
-# pptx-template-skill
+# pptx-translate-skill
 
 Template-first PPTX generation for AI workflows.
 
@@ -8,7 +8,7 @@ This repository packages a reusable skill and Python CLI that analyze a PowerPoi
 
 ## Why this exists
 
-Most PPTX automation tools either rebuild slides from scratch or expose too much low-level XML. `pptx-template-skill` takes a narrower path:
+Most PPTX automation tools either rebuild slides from scratch or expose too much low-level XML. `pptx-translate-skill` takes a narrower path:
 
 - keep the original PPTX package and layout
 - expose only safe, editable slots
@@ -45,7 +45,7 @@ Out of scope by default:
 
 ```text
 .
-├── skills/pptx-template-skill/
+├── skills/pptx-translate-skill/
 │   ├── SKILL.md
 │   ├── scripts/
 │   ├── references/
@@ -55,7 +55,7 @@ Out of scope by default:
 └── workspaces/
 ```
 
-The implementation lives under `skills/pptx-template-skill/`. Root-level `templates/` and `workspaces/` are convenient places to store source PPTX files and generated project workspaces.
+The implementation lives under `skills/pptx-translate-skill/`. Root-level `templates/` and `workspaces/` are convenient places to store source PPTX files and generated project workspaces.
 
 ## Requirements
 
@@ -70,7 +70,7 @@ Runtime code uses the Python standard library only. `uv` is mainly for environme
 From the skill directory:
 
 ```bash
-cd skills/pptx-template-skill
+cd skills/pptx-translate-skill
 uv sync
 uv run python scripts/pptx_json_cli.py setup
 ```
@@ -161,16 +161,16 @@ uv run python scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pp
 
 The deeper docs live with the skill:
 
-- [`skills/pptx-template-skill/SKILL.md`](skills/pptx-template-skill/SKILL.md)
-- [`skills/pptx-template-skill/references/workflow.md`](skills/pptx-template-skill/references/workflow.md)
-- [`skills/pptx-template-skill/references/manifest-json.md`](skills/pptx-template-skill/references/manifest-json.md)
-- [`skills/pptx-template-skill/references/content-json.md`](skills/pptx-template-skill/references/content-json.md)
-- [`skills/pptx-template-skill/references/patch-plan-json.md`](skills/pptx-template-skill/references/patch-plan-json.md)
-- [`skills/pptx-template-skill/references/ooxml-boundaries.md`](skills/pptx-template-skill/references/ooxml-boundaries.md)
+- [`skills/pptx-translate-skill/SKILL.md`](skills/pptx-translate-skill/SKILL.md)
+- [`skills/pptx-translate-skill/references/workflow.md`](skills/pptx-translate-skill/references/workflow.md)
+- [`skills/pptx-translate-skill/references/manifest-json.md`](skills/pptx-translate-skill/references/manifest-json.md)
+- [`skills/pptx-translate-skill/references/content-json.md`](skills/pptx-translate-skill/references/content-json.md)
+- [`skills/pptx-translate-skill/references/patch-plan-json.md`](skills/pptx-translate-skill/references/patch-plan-json.md)
+- [`skills/pptx-translate-skill/references/ooxml-boundaries.md`](skills/pptx-translate-skill/references/ooxml-boundaries.md)
 
 ## Testing
 
-From `skills/pptx-template-skill/`:
+From `skills/pptx-translate-skill/`:
 
 ```bash
 uv run python -m unittest discover -s tests -t tests -v

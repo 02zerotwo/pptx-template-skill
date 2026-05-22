@@ -1,4 +1,4 @@
-# pptx-template-skill
+# pptx-translate-skill
 
 一个面向 AI 工作流的 Template-first PPTX 生成引擎。
 
@@ -8,7 +8,7 @@
 
 ## 这个项目解决什么问题
 
-很多 PPTX 自动化方案要么从零重建页面，要么把底层 XML 暴露得太多。`pptx-template-skill` 走的是一条更收敛的路线：
+很多 PPTX 自动化方案要么从零重建页面，要么把底层 XML 暴露得太多。`pptx-translate-skill` 走的是一条更收敛的路线：
 
 - 保留原始 PPTX 包和版式
 - 只暴露安全、可编辑的槽位
@@ -45,7 +45,7 @@
 
 ```text
 .
-├── skills/pptx-template-skill/
+├── skills/pptx-translate-skill/
 │   ├── SKILL.md
 │   ├── scripts/
 │   ├── references/
@@ -55,7 +55,7 @@
 └── workspaces/
 ```
 
-核心实现都在 `skills/pptx-template-skill/` 下面。根目录的 `templates/` 和 `workspaces/` 适合存放源模板和生成过程中的工作区。
+核心实现都在 `skills/pptx-translate-skill/` 下面。根目录的 `templates/` 和 `workspaces/` 适合存放源模板和生成过程中的工作区。
 
 ## 环境要求
 
@@ -70,7 +70,7 @@
 进入 skill 目录：
 
 ```bash
-cd skills/pptx-template-skill
+cd skills/pptx-translate-skill
 uv sync
 uv run python scripts/pptx_json_cli.py setup
 ```
@@ -161,16 +161,16 @@ uv run python scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pp
 
 更细的说明都放在 skill 目录里：
 
-- [`skills/pptx-template-skill/SKILL.md`](skills/pptx-template-skill/SKILL.md)
-- [`skills/pptx-template-skill/references/workflow.md`](skills/pptx-template-skill/references/workflow.md)
-- [`skills/pptx-template-skill/references/manifest-json.md`](skills/pptx-template-skill/references/manifest-json.md)
-- [`skills/pptx-template-skill/references/content-json.md`](skills/pptx-template-skill/references/content-json.md)
-- [`skills/pptx-template-skill/references/patch-plan-json.md`](skills/pptx-template-skill/references/patch-plan-json.md)
-- [`skills/pptx-template-skill/references/ooxml-boundaries.md`](skills/pptx-template-skill/references/ooxml-boundaries.md)
+- [`skills/pptx-translate-skill/SKILL.md`](skills/pptx-translate-skill/SKILL.md)
+- [`skills/pptx-translate-skill/references/workflow.md`](skills/pptx-translate-skill/references/workflow.md)
+- [`skills/pptx-translate-skill/references/manifest-json.md`](skills/pptx-translate-skill/references/manifest-json.md)
+- [`skills/pptx-translate-skill/references/content-json.md`](skills/pptx-translate-skill/references/content-json.md)
+- [`skills/pptx-translate-skill/references/patch-plan-json.md`](skills/pptx-translate-skill/references/patch-plan-json.md)
+- [`skills/pptx-translate-skill/references/ooxml-boundaries.md`](skills/pptx-translate-skill/references/ooxml-boundaries.md)
 
 ## 测试
 
-在 `skills/pptx-template-skill/` 目录下运行：
+在 `skills/pptx-translate-skill/` 目录下运行：
 
 ```bash
 uv run python -m unittest discover -s tests -t tests -v

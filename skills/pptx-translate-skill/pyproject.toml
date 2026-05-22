@@ -1,5 +1,5 @@
 [project]
-name = "pptx-template-skill"
+name = "pptx-translate-skill"
 version = "0.1.0"
 description = "Template-first PPTX generation engine: expose editable OOXML slots, let AI write content JSON, compile patch plans, and export PPTX."
 requires-python = ">=3.10"

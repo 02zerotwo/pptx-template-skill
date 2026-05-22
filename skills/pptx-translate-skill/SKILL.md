@@ -1,5 +1,5 @@
 ---
-name: pptx-template-skill
+name: pptx-translate-skill
 description: >
   Use when the user wants to generate a PPTX from a template.
   Analyzes the template into editable slots, lets AI write content JSON,
@@ -16,12 +16,12 @@ AI writes `deck_content.json` by default. AI does not directly edit XML, does no
 
 ## Workflow
 
-All commands run from `skills/pptx-template-skill/` directory via `uv run python scripts/pptx_json_cli.py`.
+All commands run from `skills/pptx-translate-skill/` directory via `uv run python scripts/pptx_json_cli.py`.
 
 ### Step 0 — Setup environment (first time only)
 
 ```bash
-cd skills/pptx-template-skill
+cd skills/pptx-translate-skill
 uv sync
 uv run python scripts/pptx_json_cli.py setup
 ```
