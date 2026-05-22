@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.10"
 
 [[package]]
-name = "pptx-template-engine"
+name = "pptx-template-skill"
 version = "0.1.0"
 source = { virtual = "." }
 

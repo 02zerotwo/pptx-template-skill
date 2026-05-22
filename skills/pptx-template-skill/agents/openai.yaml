@@ -1,0 +1,4 @@
+interface:
+  display_name: "PPTX JSON Engine"
+  short_description: "Generate new PPTX files from editable template slots."
+  default_prompt: "Use pptx-template-skill to analyze a PPTX template, fill deck_content.json, compile patch_plan.json, and export a new PPTX."
