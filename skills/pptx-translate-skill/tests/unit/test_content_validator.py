@@ -33,6 +33,27 @@ class ContentValidatorTests(unittest.TestCase):
             self.assertFalse(report.ok)
             self.assertEqual(report.errors[-1]["code"], "UNKNOWN_SLOT")
 
+    def test_warns_for_text_over_capacity_because_autofit_will_shrink(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pptx = root / "template.pptx"
+            workspace = root / "workspace"
+            write_minimal_pptx(pptx)
+            analyze_template(pptx, workspace)
+            content_path = workspace / "deck_content.json"
+            content_path.write_text(json.dumps({
+                "slides": [{
+                    "template_slide": "template-slide-001",
+                    "content": {
+                        "cover_title": {"content": "x" * 500},
+                        "cover_subtitle": {"content": "Subtitle"}
+                    }
+                }]
+            }), encoding="utf-8")
+            report = validate_content(workspace, content_path, write=False)
+            self.assertTrue(report.ok)
+            self.assertEqual(report.warnings[-1]["code"], "CAPACITY_EXCEEDED")
+
 
 if __name__ == "__main__":
     unittest.main()

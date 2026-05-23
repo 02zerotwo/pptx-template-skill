@@ -37,7 +37,7 @@
 | `type` | string | `text`、`image`、`table`、`chart`、`shape` |
 | `required` | boolean | 是否必填 |
 | `editable_fields` | array | AI 允许填写的字段 |
-| `capacity` | object | 字数、行数、比例等限制 |
+| `capacity` | object | 字数、行数、比例等限制；翻译超限时用于计算自动缩小字号 |
 | `binding` | object | 导出器定位 OOXML 对象的绑定信息 |
 | `source` | object | 识别来源和当前内容摘要 |
 
@@ -60,7 +60,7 @@
 
 | Type | Source Summary |
 |---|---|
-| `text` | `current_text`、`paragraphs`、placeholder 信息 |
+| `text` | `current_text`、`paragraphs`、placeholder 信息；翻译后可自动 autofit |
 | `image` | 当前 media target、图片描述 |
 | `table` | `cells` 二维数组、行列容量 |
 | `chart` | `categories`、`series`，来自 chart XML cache |

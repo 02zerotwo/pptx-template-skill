@@ -13,6 +13,7 @@ def compile_chart_patch(target_slide: str, slot: dict[str, Any], value: dict[str
         "target_slide": target_slide,
         "binding": {
             "shape_id": slot.get("binding", {}).get("shape_id"),
+            "rel_id": slot.get("binding", {}).get("rel_id"),
             "chart_part": slot.get("binding", {}).get("chart_part"),
         },
         "slot_id": slot.get("slot_id"),

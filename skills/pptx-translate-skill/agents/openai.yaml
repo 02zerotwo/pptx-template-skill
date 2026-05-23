@@ -1,4 +1,4 @@
 interface:
-  display_name: "PPTX JSON Engine"
-  short_description: "Generate new PPTX files from editable template slots."
-  default_prompt: "Use pptx-translate-skill to analyze a PPTX template, fill deck_content.json, compile patch_plan.json, and export a new PPTX."
+  display_name: "PPTX Translate Skill"
+  short_description: "Translate PPTX files while preserving layout and package structure."
+  default_prompt: "Use pptx-translate-skill to analyze a PPTX, translate declared text/table/chart/image-alt slots in deck_content.json, compile patch_plan.json, and export a layout-preserved translated PPTX."

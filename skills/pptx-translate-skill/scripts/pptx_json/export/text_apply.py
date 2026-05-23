@@ -29,6 +29,7 @@ def apply_text_patch(package_dir: Path, operation: dict) -> None:
         tx_body = ET.SubElement(shape, qn("p", "txBody"))
         ET.SubElement(tx_body, qn("a", "bodyPr"))
         ET.SubElement(tx_body, qn("a", "lstStyle"))
+    _apply_autofit(tx_body, operation)
     if "paragraphs" in operation:
         _apply_paragraphs(tx_body, operation.get("paragraphs", []))
         write_xml(slide_path, tree)
@@ -46,6 +47,21 @@ def apply_text_patch(package_dir: Path, operation: dict) -> None:
     for extra in texts[1:]:
         extra.text = ""
     write_xml(slide_path, tree)
+
+
+def _apply_autofit(tx_body, operation: dict) -> None:
+    autofit = operation.get("autofit", {})
+    if not autofit.get("enabled"):
+        return
+    body_pr = tx_body.find("a:bodyPr", NS)
+    if body_pr is None:
+        body_pr = ET.Element(qn("a", "bodyPr"))
+        tx_body.insert(0, body_pr)
+    for child in list(body_pr):
+        if _local_name(child.tag) in {"noAutofit", "normAutofit", "spAutoFit"}:
+            body_pr.remove(child)
+    font_scale = str(int(autofit.get("font_scale") or 100000))
+    ET.SubElement(body_pr, qn("a", "normAutofit"), {"fontScale": font_scale})
 
 
 def _local_name(tag: str) -> str:

@@ -51,9 +51,15 @@
     "xpath": ".//p:sp[p:nvSpPr/p:cNvPr/@id='2']/p:txBody"
   },
   "slot_id": "cover_title",
-  "content": "2026 年市场增长策略"
+  "content": "2026 Market Growth Strategy",
+  "autofit": {
+    "enabled": true,
+    "font_scale": 86000
+  }
 }
 ```
+
+`autofit` 仅在译文超过原 slot 容量时出现。导出器会写入 PowerPoint 原生 `a:normAutofit`，用缩小字号处理文本溢出并保持文本框位置和尺寸不变。
 
 ---
 

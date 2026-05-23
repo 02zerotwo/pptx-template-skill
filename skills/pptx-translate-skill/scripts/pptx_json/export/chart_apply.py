@@ -6,6 +6,8 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from pptx_json.package.opc import write_xml
+from pptx_json.package.paths import rels_path_for_part
+from pptx_json.package.rels import load_relationships, resolve_target
 from pptx_json.xmlns import NS, qn
 
 
@@ -25,7 +27,7 @@ def _cache(parent, path: str):
 
 
 def apply_chart_patch(package_dir: Path, operation: dict) -> None:
-    chart_part = operation.get("binding", {}).get("chart_part")
+    chart_part = _chart_part_for_operation(package_dir, operation)
     if not chart_part:
         return
     chart_path = package_dir / chart_part
@@ -52,3 +54,14 @@ def apply_chart_patch(package_dir: Path, operation: dict) -> None:
         if val_cache is not None:
             _reset_cache(val_cache, values, numeric=True)
     write_xml(chart_path, tree)
+
+
+def _chart_part_for_operation(package_dir: Path, operation: dict) -> str | None:
+    target_slide = operation.get("target_slide", "")
+    rel_id = operation.get("binding", {}).get("rel_id")
+    if target_slide and rel_id:
+        rels_file = package_dir / rels_path_for_part(target_slide)
+        for rel in load_relationships(rels_file):
+            if rel.get("Id") == rel_id:
+                return resolve_target(target_slide, str(rel.get("Target") or ""))
+    return operation.get("binding", {}).get("chart_part")

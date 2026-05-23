@@ -64,6 +64,8 @@ def target_from_part(source_part: str, target_part: str) -> str:
         # enough for first-phase slide/media targets.
         if source_dir == PurePosixPath("ppt/slides") and target.parts[:2] == ("ppt", "media"):
             return str(PurePosixPath("..") / "media" / target.name)
+        if source_dir == PurePosixPath("ppt/slides") and target.parts[:2] == ("ppt", "charts"):
+            return str(PurePosixPath("..") / "charts" / target.name)
         if source_dir == PurePosixPath("ppt") and target.parts[:2] == ("ppt", "slides"):
             return str(PurePosixPath("slides") / target.name)
     except IndexError:

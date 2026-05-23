@@ -1,7 +1,7 @@
 [project]
 name = "pptx-translate-skill"
 version = "0.1.0"
-description = "Template-first PPTX generation engine: expose editable OOXML slots, let AI write content JSON, compile patch plans, and export PPTX."
+description = "PPTX translation engine: expose translatable OOXML slots, let AI write translated content JSON, compile patch plans, and export layout-preserved PPTX."
 requires-python = ">=3.10"
 readme = "SKILL.md"
 
