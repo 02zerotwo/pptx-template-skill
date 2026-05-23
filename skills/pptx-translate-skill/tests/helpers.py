@@ -57,13 +57,13 @@ def write_minimal_pptx(path: Path) -> None:
       <p:grpSpPr/>
       <p:sp>
         <p:nvSpPr><p:cNvPr id="2" name="Title"/><p:cNvSpPr/><p:nvPr><p:ph type="title"/></p:nvPr></p:nvSpPr>
-        <p:spPr/>
-        <p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:t>{{cover_title}}</a:t></a:r></a:p></p:txBody>
+        <p:spPr><a:xfrm><a:off x="100000" y="100000"/><a:ext cx="3000000" cy="500000"/></a:xfrm></p:spPr>
+        <p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr sz="2400"/><a:t>{{cover_title}}</a:t></a:r></a:p></p:txBody>
       </p:sp>
       <p:sp>
         <p:nvSpPr><p:cNvPr id="4" name="Subtitle"/><p:cNvSpPr/><p:nvPr><p:ph type="subTitle"/></p:nvPr></p:nvSpPr>
-        <p:spPr/>
-        <p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:t>{{cover_subtitle}}</a:t></a:r></a:p></p:txBody>
+        <p:spPr><a:xfrm><a:off x="100000" y="700000"/><a:ext cx="3000000" cy="400000"/></a:xfrm></p:spPr>
+        <p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr sz="1800"/><a:t>{{cover_subtitle}}</a:t></a:r></a:p></p:txBody>
       </p:sp>
       <p:pic>
         <p:nvPicPr><p:cNvPr id="3" name="{{hero_image}}" descr="{{hero_image}}"/><p:cNvPicPr/><p:nvPr/></p:nvPicPr>

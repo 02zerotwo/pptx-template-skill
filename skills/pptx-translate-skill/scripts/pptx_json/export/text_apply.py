@@ -32,6 +32,7 @@ def apply_text_patch(package_dir: Path, operation: dict) -> None:
     _apply_autofit(tx_body, operation)
     if "paragraphs" in operation:
         _apply_paragraphs(tx_body, operation.get("paragraphs", []))
+        _mark_autofit_text_dirty(tx_body, operation)
         write_xml(slide_path, tree)
         return
     texts = tx_body.findall(".//a:t", NS)
@@ -46,6 +47,8 @@ def apply_text_patch(package_dir: Path, operation: dict) -> None:
     texts[0].text = str(operation.get("content", ""))
     for extra in texts[1:]:
         extra.text = ""
+    _mark_autofit_text_dirty(tx_body, operation)
+    _apply_layout(shape, tx_body, operation)
     write_xml(slide_path, tree)
 
 
@@ -60,8 +63,47 @@ def _apply_autofit(tx_body, operation: dict) -> None:
     for child in list(body_pr):
         if _local_name(child.tag) in {"noAutofit", "normAutofit", "spAutoFit"}:
             body_pr.remove(child)
-    font_scale = str(int(autofit.get("font_scale") or 100000))
-    ET.SubElement(body_pr, qn("a", "normAutofit"), {"fontScale": font_scale})
+    ET.SubElement(body_pr, qn("a", "normAutofit"))
+
+
+def _mark_autofit_text_dirty(tx_body, operation: dict) -> None:
+    autofit = operation.get("autofit", {})
+    if not autofit.get("enabled"):
+        return
+    for props in tx_body.findall(".//a:rPr", NS) + tx_body.findall(".//a:endParaRPr", NS):
+        props.attrib["dirty"] = "1"
+        props.attrib["smtClean"] = "0"
+
+
+def _scaled_value(value: str, scale: int) -> str:
+    return str(max(100, round(int(value) * scale / 100000)))
+
+
+def _apply_layout(shape, tx_body, operation: dict) -> None:
+    layout = operation.get("layout", {})
+    if not layout:
+        return
+    scale = int(layout.get("font_scale") or 100000)
+    if scale < 100000:
+        for props in tx_body.findall(".//a:rPr", NS) + tx_body.findall(".//a:endParaRPr", NS):
+            if props.attrib.get("sz"):
+                props.attrib["sz"] = _scaled_value(props.attrib["sz"], scale)
+        for spacing in tx_body.findall(".//a:lnSpc/a:spcPts", NS):
+            if spacing.attrib.get("val"):
+                spacing.attrib["val"] = _scaled_value(spacing.attrib["val"], scale)
+    expand_cx = int(layout.get("expand_cx") or 0)
+    if expand_cx <= 0:
+        return
+    xfrm = shape.find("p:spPr/a:xfrm", NS)
+    if xfrm is None:
+        sp_pr = shape.find("p:spPr", NS)
+        if sp_pr is None:
+            sp_pr = ET.SubElement(shape, qn("p", "spPr"))
+        xfrm = ET.SubElement(sp_pr, qn("a", "xfrm"))
+    ext = xfrm.find("a:ext", NS)
+    if ext is None:
+        ext = ET.SubElement(xfrm, qn("a", "ext"), {"cx": "0", "cy": "0"})
+    ext.attrib["cx"] = str(int(ext.attrib.get("cx", "0")) + expand_cx)
 
 
 def _local_name(tag: str) -> str:

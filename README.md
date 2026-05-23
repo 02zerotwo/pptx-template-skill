@@ -1,31 +1,87 @@
 # pptx-translate-skill
 
-Template-first PPTX generation for AI workflows.
+A template-first PowerPoint skill for AI agents.
 
-This repository packages a reusable skill and Python CLI that analyze a PowerPoint template into editable slots, let an AI write structured `deck_content.json`, compile a stable patch plan, and export a finished `.pptx` without hand-editing OOXML.
+`pptx-translate-skill` translates or rewrites an existing `.pptx` without rebuilding the deck from scratch. It analyzes a source PowerPoint file into safe editable slots, asks the AI to write structured `deck_content.json`, compiles that JSON into a deterministic patch plan, and exports a finished PPTX while preserving the original layout, theme, media, and package structure.
 
 [中文说明](README.zh-CN.md)
 
-## Why this exists
+## Quick Install
 
-Most PPTX automation tools either rebuild slides from scratch or expose too much low-level XML. `pptx-translate-skill` takes a narrower path:
+The `npx skills add` CLI scans the `skills/` folder in this repo, so install the skill with one command:
 
-- keep the original PPTX package and layout
-- expose only safe, editable slots
-- let AI write content JSON instead of XML
-- preserve non-editable objects by default
-- export a final PPTX through a predictable pipeline
+```bash
+npx skills add https://github.com/02zerotwo/pptx-translate-skill
+```
 
-That makes it a good fit for template-based deck generation, report production, and agent workflows where structure matters more than freeform slide drawing.
+Install only this skill by its install name. Use the `name:` field inside `SKILL.md` frontmatter, not the folder name:
 
-## What you get
+```bash
+npx skills add https://github.com/02zerotwo/pptx-translate-skill --skill "pptx-translate-skill"
+```
 
-- `SKILL.md` for agent-driven PPTX generation
-- a Python CLI for setup, init, build, validation, and export
-- JSON contracts for manifest, content, and patch plans
-- examples, references, and tests
+After installation, use it by asking your agent to translate or rewrite a PPTX while preserving layout:
 
-Supported editable slot types today:
+```text
+Use pptx-translate-skill to translate ./deck.pptx into English.
+Keep the original layout, charts, images, and animations.
+```
+
+The skill includes its own `SKILL.md`, reference docs, and Python scripts. In normal use, the user gives the agent a PPTX file and the agent returns a translated PPTX. Temporary analysis files, workspaces, caches, and generated outputs are implementation details.
+
+You can also copy `skills/pptx-translate-skill/SKILL.md` into your project, or paste it into ChatGPT / Codex conversations when a skills installer is not available.
+
+## Agent Usage
+
+Good prompts are outcome-oriented:
+
+```text
+Use pptx-translate-skill to translate ./q3-report.pptx to Chinese.
+Preserve slide count, layout, theme, images, charts, and animation behavior.
+Keep product names, URLs, dates, and numbers unchanged.
+```
+
+```text
+Use pptx-translate-skill to localize ./sales-deck.pptx for a Japanese audience.
+Use the glossary in ./glossary.md and export a finished .pptx.
+```
+
+The agent-facing workflow is internal:
+
+1. Analyze the source PPTX into a manifest of editable slots.
+2. Fill only declared slots in `deck_content.json`.
+3. Validate content before export.
+4. Compile a deterministic patch plan.
+5. Export and return the final PPTX path.
+
+## Why This Exists
+
+Most PPTX automation tools take one of two risky paths: they either redraw every slide from scratch, or they expose too much raw OOXML to the AI. Both approaches make it easy to break layout, theme relationships, media placement, chart wiring, or hidden package structure.
+
+This skill uses a narrower contract:
+
+- keep the original PPTX package as the source of truth
+- expose only editable, validated slots
+- let the AI write content JSON, not XML
+- compile edits into a stable patch plan
+- export by modifying only supported OOXML targets
+- reject unsupported edits instead of pretending they are safe
+
+The result is a workflow that fits translation, report localization, template-based deck generation, and agent workflows where preserving the existing design matters.
+
+## Implementation Approach
+
+The engine is built around a five-stage pipeline.
+
+1. `analyze-template` opens the PPTX package, reads slide relationships and supported OOXML parts, and produces `template_manifest.json`.
+2. `inspect-manifest` summarizes editable slots for the AI: text boxes, tables, chart labels, image alt text, and supported shape text.
+3. The AI writes `deck_content.json` using only slot IDs declared in the manifest.
+4. `validate-content` and `compile-patch` check the content contract, capacity limits, resource paths, and stale bindings, then create `patch_plan.json`.
+5. `export-pptx` applies the patch plan to a copy of the source PPTX and writes the final deck.
+
+The important design choice is separation of responsibility: AI decides content, while the engine decides whether and how that content can be safely applied.
+
+Supported editable slot types:
 
 - `text`
 - `image`
@@ -40,8 +96,44 @@ Out of scope by default:
 - notes pages
 - video/audio editing
 - arbitrary embedded object editing
+- freeform OOXML patches
 
-## Repository layout
+## How The Skill Works
+
+When an agent uses this skill, the core rule is:
+
+```text
+AI writes deck_content.json. AI does not directly edit OOXML.
+```
+
+The bundled CLI is for agents and maintainers. Agents can use it to create temporary workspaces, inspect slots, validate content, build the final deck, and verify terminology. End users usually only need to install the skill, provide a source PPTX, and ask for the desired translated PPTX output.
+
+For translation, preserve facts by default: numbers, units, dates, URLs, emails, product names, company names, and legal names should stay unchanged unless the user provides a glossary.
+
+Long translated text can exceed the original box capacity. In that case validation emits a warning, and export writes PowerPoint native autofit settings so the text can shrink inside the original bounds.
+
+## Maintainer CLI
+
+When developing or debugging the skill from this repository, run commands from `skills/pptx-translate-skill/`:
+
+```bash
+python3 scripts/pptx_json_cli.py init <source.pptx> -w <workspace>
+python3 scripts/pptx_json_cli.py build <workspace>
+```
+
+Granular commands are also available:
+
+```bash
+python3 scripts/pptx_json_cli.py analyze-template <source.pptx> -o <workspace>
+python3 scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai
+python3 scripts/pptx_json_cli.py draft-content <workspace> -o <workspace>/deck_content.skeleton.json
+python3 scripts/pptx_json_cli.py validate-content <workspace> <workspace>/deck_content.json
+python3 scripts/pptx_json_cli.py compile-patch <workspace> <workspace>/deck_content.json
+python3 scripts/pptx_json_cli.py export-pptx <workspace> -o <workspace>/exports/output.pptx
+python3 scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms ... --new-terms ...
+```
+
+## Repository Layout
 
 ```text
 .
@@ -49,117 +141,20 @@ Out of scope by default:
 │   ├── SKILL.md
 │   ├── scripts/
 │   ├── references/
-│   ├── examples/
 │   └── tests/
-├── templates/
-└── workspaces/
+└── README.md
 ```
 
-The implementation lives under `skills/pptx-translate-skill/`. Root-level `templates/` and `workspaces/` are convenient places to store source PPTX files and generated project workspaces.
+The reusable skill and CLI live under `skills/pptx-translate-skill/`. User PPTX files and generated workspaces are runtime artifacts, not part of the repository contract.
 
 ## Requirements
 
 - Python 3.10+
-- [`uv`](https://docs.astral.sh/uv/) recommended
 - macOS, Linux, or Windows via WSL
 
-Runtime code uses the Python standard library only. `uv` is mainly for environment and command management.
+Runtime code uses the Python standard library only.
 
-## Quick start
-
-From the skill directory:
-
-```bash
-cd skills/pptx-translate-skill
-uv sync
-uv run python scripts/pptx_json_cli.py setup
-```
-
-Initialize a workspace from a template:
-
-```bash
-uv run python scripts/pptx_json_cli.py init ../../templates/template.pptx -w ../../workspaces/my-deck
-```
-
-This creates a workspace with:
-
-- copied source template
-- `template_manifest.json`
-- slot summary
-- `deck_content.skeleton.json`
-
-Write `deck_content.json`, then build:
-
-```bash
-uv run python scripts/pptx_json_cli.py build ../../workspaces/my-deck
-```
-
-Output:
-
-```text
-workspaces/my-deck/exports/output.pptx
-```
-
-## AI workflow
-
-The intended flow is short and strict:
-
-1. Analyze the PPTX template into `template_manifest.json`
-2. Write `deck_content.json` using only declared slots
-3. Validate content against slot rules and capacity
-4. Compile `patch_plan.json`
-5. Export the final PPTX
-
-The core rule is simple: AI writes content JSON, not raw XML.
-
-## Example content
-
-```json
-{
-  "schema_version": "1.0",
-  "title": "2026 Market Growth Strategy",
-  "slides": [
-    {
-      "template_slide": "template-slide-001",
-      "content": {
-        "cover_title": {
-          "content": "2026 Market Growth Strategy"
-        },
-        "hero_image": {
-          "src": "assets/generated/hero.png",
-          "alt": "market strategy hero image"
-        }
-      }
-    }
-  ]
-}
-```
-
-## CLI commands
-
-One-shot commands:
-
-```bash
-uv run python scripts/pptx_json_cli.py setup
-uv run python scripts/pptx_json_cli.py init <template.pptx> -w <workspace>
-uv run python scripts/pptx_json_cli.py build <workspace>
-```
-
-Granular commands are also available:
-
-```bash
-uv run python scripts/pptx_json_cli.py analyze-template <template.pptx> -o <workspace>
-uv run python scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai
-uv run python scripts/pptx_json_cli.py draft-content <workspace> -o <workspace>/deck_content.skeleton.json
-uv run python scripts/pptx_json_cli.py validate-content <workspace> <workspace>/deck_content.json
-uv run python scripts/pptx_json_cli.py compile-patch <workspace> <workspace>/deck_content.json
-uv run python scripts/pptx_json_cli.py export-pptx <workspace> -o <workspace>/exports/output.pptx
-uv run python scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms ... --new-terms ...
-```
-
-## Contracts and references
-
-The deeper docs live with the skill:
+## References
 
 - [`skills/pptx-translate-skill/SKILL.md`](skills/pptx-translate-skill/SKILL.md)
 - [`skills/pptx-translate-skill/references/workflow.md`](skills/pptx-translate-skill/references/workflow.md)
@@ -173,22 +168,11 @@ The deeper docs live with the skill:
 From `skills/pptx-translate-skill/`:
 
 ```bash
-uv run python -m unittest discover -s tests -t tests -v
+python3 -m unittest discover -s tests -t tests -v
 ```
 
 Unit tests only:
 
 ```bash
-uv run python -m unittest discover -s tests/unit -t tests -v
+python3 -m unittest discover -s tests/unit -t tests -v
 ```
-
-## Design notes
-
-This project is intentionally conservative:
-
-- preserve template fidelity first
-- keep the public interface JSON-based
-- keep patch compilation deterministic
-- reject unsupported edits instead of pretending they are safe
-
-If validation fails because of missing slots, stale bindings, path issues, or over-capacity text, the correct next step is to fix the template or content rather than bypass the workflow.

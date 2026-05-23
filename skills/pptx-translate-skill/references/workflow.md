@@ -14,7 +14,7 @@
 | --- | --- |
 | Python | >= 3.10 |
 | 操作系统 | macOS / Linux / Windows (WSL) |
-| 包管理工具 | [uv](https://docs.astral.sh/uv/) |
+| 包管理工具 | 不需要 |
 
 引擎仅使用 Python 标准库，无第三方运行依赖。
 
@@ -22,16 +22,16 @@
 
 ## 3. AI 快速流程
 
-所有命令从 `skills/pptx-translate-skill/` 目录运行。
+命令由 agent 调用内置 `scripts/pptx_json_cli.py`。`<skill-root>` 指包含本 `SKILL.md` 的 skill 目录。不要要求用户手动初始化环境，也不要要求用户创建 `templates/`、`workspaces/`、manifest 或 content JSON；普通使用时用户只需要提供源 PPTX，agent 返回翻译后的 PPTX。
 
 | Step | Command | Output |
 | --- | --- | --- |
-| 环境准备 | `uv sync && uv run python scripts/pptx_json_cli.py setup` | 环境检查报告 |
-| 初始化翻译工作区 | `uv run python scripts/pptx_json_cli.py init <source.pptx> -w <workspace>` | 工作区 + 槽位摘要 + 内容骨架 |
-| 检查槽位 | `uv run python scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai` | AI 友好的可翻译槽位摘要 |
+| 初始化临时工作区 | `python3 <skill-root>/scripts/pptx_json_cli.py init <source.pptx> -w <workspace>` | 工作区 + 槽位摘要 + 内容骨架 |
+| 检查槽位 | `python3 <skill-root>/scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai` | AI 友好的可翻译槽位摘要 |
 | 写翻译内容 | AI 写 `<workspace>/deck_content.json` | 翻译内容 JSON |
-| 一键构建 | `uv run python scripts/pptx_json_cli.py build <workspace>` | 校验 + 编译 + 导出 PPTX |
-| 翻译验证 | `uv run python scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms ... --new-terms ...` | 可见文本残留检查 |
+| 一键构建 | `python3 <skill-root>/scripts/pptx_json_cli.py build <workspace>` | 校验 + 编译 + 导出 PPTX |
+| 翻译验证 | `python3 <skill-root>/scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms ... --new-terms ...` | 可见文本残留检查 |
+| 返回结果 | 把 `<workspace>/exports/output.pptx` 提供给用户 | 翻译后的 PPTX |
 
 ---
 
@@ -79,18 +79,18 @@
 
 | Step | Command | Output |
 | --- | --- | --- |
-| 分析 PPTX | `uv run python scripts/pptx_json_cli.py analyze-template <source.pptx> -o <workspace>` | `template_manifest.json` |
-| 检查槽位 | `uv run python scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai` | AI 友好的槽位摘要 |
-| 生成骨架 | `uv run python scripts/pptx_json_cli.py draft-content <workspace> -o <workspace>/deck_content.skeleton.json` | 内容骨架 |
-| 校验内容 | `uv run python scripts/pptx_json_cli.py validate-content <workspace> <workspace>/deck_content.json` | 校验报告 |
-| 编译补丁 | `uv run python scripts/pptx_json_cli.py compile-patch <workspace> <workspace>/deck_content.json` | `patch_plan.json` |
-| 导出 PPTX | `uv run python scripts/pptx_json_cli.py export-pptx <workspace> -o <workspace>/exports/output.pptx` | 翻译版 PPTX |
-| 导出验证 | `uv run python scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms ... --new-terms ...` | 可见文本残留检查 |
+| 分析 PPTX | `python3 <skill-root>/scripts/pptx_json_cli.py analyze-template <source.pptx> -o <workspace>` | `template_manifest.json` |
+| 检查槽位 | `python3 <skill-root>/scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai` | AI 友好的槽位摘要 |
+| 生成骨架 | `python3 <skill-root>/scripts/pptx_json_cli.py draft-content <workspace> -o <workspace>/deck_content.skeleton.json` | 内容骨架 |
+| 校验内容 | `python3 <skill-root>/scripts/pptx_json_cli.py validate-content <workspace> <workspace>/deck_content.json` | 校验报告 |
+| 编译补丁 | `python3 <skill-root>/scripts/pptx_json_cli.py compile-patch <workspace> <workspace>/deck_content.json` | `patch_plan.json` |
+| 导出 PPTX | `python3 <skill-root>/scripts/pptx_json_cli.py export-pptx <workspace> -o <workspace>/exports/output.pptx` | 翻译版 PPTX |
+| 导出验证 | `python3 <skill-root>/scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms ... --new-terms ...` | 可见文本残留检查 |
 
 ---
 
 ## 8. 运行测试
 
 ```bash
-uv run python -m unittest discover -s tests -t tests -v
+python3 -m unittest discover -s tests -t tests -v
 ```

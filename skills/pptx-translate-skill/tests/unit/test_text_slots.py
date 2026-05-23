@@ -24,6 +24,9 @@ class TextSlotTests(unittest.TestCase):
             slot_ids = {slot["slot_id"] for slot in slots}
             self.assertIn("cover_title", slot_ids)
             self.assertIn("cover_subtitle", slot_ids)
+            title = next(slot for slot in slots if slot["slot_id"] == "cover_title")
+            self.assertIn("box", title["capacity"])
+            self.assertIn("font_size", title["source"])
 
     def test_extracts_paragraphs_and_replaces_structured_paragraphs(self):
         with tempfile.TemporaryDirectory() as tmp:

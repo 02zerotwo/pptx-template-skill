@@ -1,13 +1,14 @@
 ---
 name: pptx-translate-skill
 description: >
-  Use when the user wants to translate an existing PPTX while preserving
-  slide layout, theme, media, animations, and OOXML package structure.
+  Use when the user wants to translate, localize, or rewrite an existing PPTX
+  while preserving slide layout, theme, media, animations, and OOXML package
+  structure.
 ---
 
 # PPTX Translate Skill
 
-Use this skill to translate a PPTX into another language without rebuilding the deck. The workflow is source-deck-first: analyze translatable slots, write translated `deck_content.json`, compile a controlled patch plan, export a translated PPTX, and verify visible text.
+Use this skill to translate, localize, or rewrite a PPTX without rebuilding the deck. The workflow is source-deck-first: analyze editable slots, write `deck_content.json`, compile a controlled patch plan, export a PPTX, and verify visible text.
 
 ## Core Rules
 
@@ -19,20 +20,14 @@ Translate meaning, not geometry. Keep numbers, units, product names, URLs, email
 
 ## Workflow
 
-All commands run from `skills/pptx-translate-skill/` via `uv run python scripts/pptx_json_cli.py`.
+Use the bundled CLI in `scripts/pptx_json_cli.py`. Resolve `<skill-root>` as the directory containing this `SKILL.md`. The runtime has no third-party dependencies; use `python3` directly unless the local environment requires another launcher.
 
-### Step 0 — Setup Environment
+Create any workspace as a temporary runtime artifact outside the installed skill directory. Prefer an ignored `workspaces/` directory in the current project when available; otherwise use a temporary directory. Treat the workspace as internal and report only the final exported PPTX path unless debugging details are useful.
 
-```bash
-cd skills/pptx-translate-skill
-uv sync
-uv run python scripts/pptx_json_cli.py setup
-```
-
-### Step 1 — Initialize Translation Workspace
+### Step 1 — Initialize Workspace
 
 ```bash
-uv run python scripts/pptx_json_cli.py init <source.pptx> -w <workspace>
+python3 <skill-root>/scripts/pptx_json_cli.py init <source.pptx> -w <workspace>
 ```
 
 Output: `template_manifest.json`, translatable slot summary, and `deck_content.skeleton.json`.
@@ -40,7 +35,7 @@ Output: `template_manifest.json`, translatable slot summary, and `deck_content.s
 ### Step 2 — Inspect Translatable Slots
 
 ```bash
-uv run python scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai
+python3 <skill-root>/scripts/pptx_json_cli.py inspect-manifest <workspace> --for-ai
 ```
 
 Check every slide. Do not translate only obvious text boxes; inspect table, chart, and image-alt slots too.
@@ -51,30 +46,30 @@ Use only slots declared by the manifest.
 
 Translate these elements when present:
 
-| Element | What to Translate | What to Preserve |
-| --- | --- | --- |
-| Text boxes and placeholders | `text.content` or `text.paragraphs` | Paragraph intent, bullets, emphasis, line breaks where practical |
-| Tables | Text in `table.cells` | Row/column count, numeric values, alignment intent |
-| Charts | Category labels and `series.name` | Numeric `series.values`, chart type, embedded workbook assumptions |
-| Images | `image.alt` descriptions | `src`, crop, size, position unless replacing media is requested |
-| Shape text | Detected as `text` slots | Shape geometry and style |
+| Element                     | What to Translate                   | What to Preserve                                                   |
+| --------------------------- | ----------------------------------- | ------------------------------------------------------------------ |
+| Text boxes and placeholders | `text.content` or `text.paragraphs` | Paragraph intent, bullets, emphasis, line breaks where practical   |
+| Tables                      | Text in `table.cells`               | Row/column count, numeric values, alignment intent                 |
+| Charts                      | Category labels and `series.name`   | Numeric `series.values`, chart type, embedded workbook assumptions |
+| Images                      | `image.alt` descriptions            | `src`, crop, size, position unless replacing media is requested    |
+| Shape text                  | Detected as `text` slots            | Shape geometry and style                                           |
 
 Do not translate unsupported or non-visible objects: SmartArt internals, speaker notes, comments, animation labels, video/audio content, OLE objects, macros, or arbitrary embedded files.
 
 ### Step 4 — Build Translated PPTX
 
 ```bash
-uv run python scripts/pptx_json_cli.py build <workspace>
+python3 <skill-root>/scripts/pptx_json_cli.py build <workspace>
 ```
 
-Output: `<workspace>/exports/output.pptx`.
+Output: `<workspace>/exports/output.pptx`. Return this file to the user as the translated PPTX.
 
 If translated text exceeds the original slot capacity, validation emits a warning and export automatically enables PowerPoint text autofit (`normAutofit`) with reduced `fontScale`. Do not manually resize boxes or move objects unless the user explicitly asks and the object is supported.
 
 ### Step 5 — Verify Translation
 
 ```bash
-uv run python scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms <old...> --new-terms <new...>
+python3 <skill-root>/scripts/pptx_json_cli.py verify-pptx <workspace>/exports/output.pptx --old-terms <old...> --new-terms <new...>
 ```
 
 Manually sanity-check: no source-language residue in visible slots, no accidental numeric changes, charts and tables still align, and long translated labels remain inside their original boxes.
@@ -87,10 +82,10 @@ Capacity overflow is not fatal for translation. Treat it as a layout-risk warnin
 
 ## References
 
-| File | Use |
-| --- | --- |
-| `references/workflow.md` | Full translation workflow, commands, rules, and verification |
-| `references/manifest-json.md` | `template_manifest.json` slot contract |
-| `references/content-json.md` | `deck_content.json` translation contract |
-| `references/patch-plan-json.md` | Stable `patch_plan.json` contract, including text autofit |
+| File                             | Use                                                             |
+| -------------------------------- | --------------------------------------------------------------- |
+| `references/workflow.md`         | Full translation workflow, commands, rules, and verification    |
+| `references/manifest-json.md`    | `template_manifest.json` slot contract                          |
+| `references/content-json.md`     | `deck_content.json` translation contract                        |
+| `references/patch-plan-json.md`  | Stable `patch_plan.json` contract, including text autofit       |
 | `references/ooxml-boundaries.md` | Translatable objects, preserved objects, and refusal boundaries |

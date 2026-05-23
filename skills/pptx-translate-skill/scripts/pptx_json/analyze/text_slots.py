@@ -47,6 +47,29 @@ def _run_summary(run) -> dict[str, Any]:
     }
 
 
+def _shape_box(shape) -> dict[str, int] | None:
+    xfrm = shape.find("p:spPr/a:xfrm", NS)
+    if xfrm is None:
+        return None
+    off = xfrm.find("a:off", NS)
+    ext = xfrm.find("a:ext", NS)
+    if off is None or ext is None:
+        return None
+    return {
+        "x": int(off.attrib.get("x", "0")),
+        "y": int(off.attrib.get("y", "0")),
+        "cx": int(ext.attrib.get("cx", "0")),
+        "cy": int(ext.attrib.get("cy", "0")),
+    }
+
+
+def _font_size(shape) -> int | None:
+    for props in shape.findall(".//a:rPr", NS) + shape.findall(".//a:endParaRPr", NS):
+        if props.attrib.get("sz"):
+            return int(props.attrib["sz"])
+    return None
+
+
 def _paragraphs(shape) -> list[dict[str, Any]]:
     tx_body = shape.find("p:txBody", NS)
     if tx_body is None:
@@ -70,9 +93,13 @@ def _paragraph_count(shape) -> int:
     return max(1, len(shape.findall(".//a:p", NS)))
 
 
-def _capacity(text: str, shape) -> dict[str, int]:
+def _capacity(text: str, shape) -> dict[str, Any]:
     base = max(40, len(text.replace("{{", "").replace("}}", "")) * 2)
-    return {"max_chars": min(max(base, 80), 500), "max_lines": _paragraph_count(shape)}
+    capacity: dict[str, Any] = {"max_chars": min(max(base, 80), 500), "max_lines": _paragraph_count(shape)}
+    box = _shape_box(shape)
+    if box:
+        capacity["box"] = box
+    return capacity
 
 
 def _unique(slot_id: str, seen: set[str], slide_index: int) -> str:
@@ -134,6 +161,7 @@ def detect_text_slots(package_dir: Path, slide: dict[str, Any]) -> list[dict[str
                     "shape_name": name,
                     "placeholder_type": ph_type,
                     "current_text": shape_text,
+                    "font_size": _font_size(shape),
                     "paragraphs": _paragraphs(shape),
                 },
             })
